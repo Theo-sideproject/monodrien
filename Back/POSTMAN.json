@@ -1,0 +1,622 @@
+{
+  "info": {
+    "name": "Monodrien API",
+    "description": "Collection complète pour tester l'API Monodrien Backend",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "game_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🏥 Santé",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Vérifier l'état du serveur"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔐 Authentification",
+      "item": [
+        {
+          "name": "Inscription",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', response.token);",
+                  "    pm.collectionVariables.set('user_id', response.user.id);",
+                  "    console.log('Token sauvegardé:', response.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"alice_gaming\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"Alice123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Connexion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', response.token);",
+                  "    pm.collectionVariables.set('user_id', response.user.id);",
+                  "    console.log('Token sauvegardé:', response.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"alice@example.com\",\n  \"password\": \"Alice123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Profil utilisateur",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Modifier profil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"alice_pro_gamer\",\n  \"preferences\": {\n    \"theme\": \"dark\",\n    \"notifications\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Changer mot de passe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Alice123!\",\n  \"newPassword\": \"NewPass456!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "change-password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎮 Parties",
+      "item": [
+        {
+          "name": "Lister parties publiques",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/games?status=waiting&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["games"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "waiting"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer une partie",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('game_id', response.gameId);",
+                  "    console.log('Game ID sauvegardé:', response.gameId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ma super partie\",\n  \"gameMode\": \"classique\",\n  \"visibility\": \"public\",\n  \"maxPlayers\": 4\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/games",
+              "host": ["{{base_url}}"],
+              "path": ["games"]
+            }
+          }
+        },
+        {
+          "name": "Détails d'une partie",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/games/{{game_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["games", "{{game_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Rejoindre une partie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/games/{{game_id}}/join",
+              "host": ["{{base_url}}"],
+              "path": ["games", "{{game_id}}", "join"]
+            }
+          }
+        },
+        {
+          "name": "Quitter une partie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/games/{{game_id}}/leave",
+              "host": ["{{base_url}}"],
+              "path": ["games", "{{game_id}}", "leave"]
+            }
+          }
+        },
+        {
+          "name": "Démarrer une partie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/games/{{game_id}}/start",
+              "host": ["{{base_url}}"],
+              "path": ["games", "{{game_id}}", "start"]
+            }
+          }
+        },
+        {
+          "name": "État du jeu",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/games/{{game_id}}/state",
+              "host": ["{{base_url}}"],
+              "path": ["games", "{{game_id}}", "state"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Utilisateurs",
+      "item": [
+        {
+          "name": "Mon profil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["users", "me"]
+            }
+          }
+        },
+        {
+          "name": "Mes parties",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/me/games?status=finished&limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["users", "me", "games"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "finished"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mes statistiques",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/me/stats",
+              "host": ["{{base_url}}"],
+              "path": ["users", "me", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Profil public utilisateur",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Classement",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/leaderboard?sortBy=winRate&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["users", "leaderboard"],
+              "query": [
+                {
+                  "key": "sortBy",
+                  "value": "winRate"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧪 Tests Scénarios",
+      "item": [
+        {
+          "name": "Scénario complet: Créer compte + partie",
+          "item": [
+            {
+              "name": "1. Inscription Bob",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 201 Created', () => {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test('Token reçu', () => {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.token).to.be.a('string');",
+                      "    pm.collectionVariables.set('bob_token', response.token);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"bob_player\",\n  \"email\": \"bob@example.com\",\n  \"password\": \"Bob123!\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "register"]
+                }
+              }
+            },
+            {
+              "name": "2. Bob crée une partie",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Partie créée', () => {",
+                      "    pm.response.to.have.status(201);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.gameId).to.be.a('string');",
+                      "    pm.collectionVariables.set('bob_game_id', response.gameId);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bob_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Partie de Bob\",\n  \"gameMode\": \"classique\",\n  \"visibility\": \"public\",\n  \"maxPlayers\": 4\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/games",
+                  "host": ["{{base_url}}"],
+                  "path": ["games"]
+                }
+              }
+            },
+            {
+              "name": "3. Alice rejoint la partie de Bob",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/games/{{bob_game_id}}/join",
+                  "host": ["{{base_url}}"],
+                  "path": ["games", "{{bob_game_id}}", "join"]
+                }
+              }
+            },
+            {
+              "name": "4. Bob démarre la partie",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bob_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/games/{{bob_game_id}}/start",
+                  "host": ["{{base_url}}"],
+                  "path": ["games", "{{bob_game_id}}", "start"]
+                }
+              }
+            },
+            {
+              "name": "5. État de la partie en cours",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/games/{{bob_game_id}}/state",
+                  "host": ["{{base_url}}"],
+                  "path": ["games", "{{bob_game_id}}", "state"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Log des variables globales",
+          "console.log('Base URL:', pm.collectionVariables.get('base_url'));",
+          "console.log('JWT Token:', pm.collectionVariables.get('jwt_token') ? 'Défini' : 'Non défini');"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Tests globaux",
+          "pm.test('Response time < 2000ms', () => {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "pm.test('Content-Type is JSON', () => {",
+          "    if (pm.response.headers.get('Content-Type')) {",
+          "        pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+          "    }",
+          "});"
+        ]
+      }
+    }
+  ]
+} 

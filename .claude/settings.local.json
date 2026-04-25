@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm run test:unit:*)",
+      "Bash(npm run test:auth:*)",
+      "Bash(npm test:*)"
+    ],
+    "deny": []
+  }
+}
